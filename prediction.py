@@ -3,6 +3,7 @@ import PIL.Image
 import numpy as np
 import re
 import pandas as pd
+import sys
 
 def clean_breed_name(breed_str):
     breed_str = re.sub(r'^n\d+\-', '', breed_str)
@@ -37,10 +38,12 @@ def core_ml_image_prediction(model: str, path: str, resize_to: tuple[int, int] |
     """
     # resize_to: (Width, Height)
     model = ct.models.MLModel(model)
-    width = model.get_spec().description.input[0].type.imageType.width
-    height = model.get_spec().description.input[0].type.imageType.height
     img = PIL.Image.open(path)
-    if resize_to is not False:
+    if isinstance(resize_to, tuple):
+        img = img.resize(resize_to, PIL.Image.LANCZOS)
+    elif resize_to is not False:
+        width = model.get_spec().description.input[0].type.imageType.width
+        height = model.get_spec().description.input[0].type.imageType.height
         img = img.resize((width,height), PIL.Image.LANCZOS)
     img_np = np.array(img).astype(np.float32)
     model_output = model.predict({'image': img})
@@ -51,9 +54,19 @@ def core_ml_image_prediction(model: str, path: str, resize_to: tuple[int, int] |
     cleaned_result = {'breed': target_breed, 'probabilities': rounded_probabilities}
     return img_np, img, cleaned_result
 
+def main():
+    if len(sys.argv) < 3:
+        print("Usage: python script.py <model_path> <image_path>")
+        sys.exit(1)
+
+    model_path = sys.argv[1]
+    image_path = sys.argv[2]
+    img_np, img, result = core_ml_image_prediction(model_path, image_path)
+    print(f"Predicted breed: {result['breed']}")
+    print(result['probabilities'].head())
+
 if __name__ == "__main__":
-    clean_breed_name()
-    core_ml_image_prediction()
+    main()
 
 
 
