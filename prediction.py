@@ -62,11 +62,8 @@ def main():
     model_path = sys.argv[1]
     image_path = sys.argv[2]
     img_np, img, result = core_ml_image_prediction(model_path, image_path)
-    print(f"Predicted breed: {result['breed']}")
+    print(f"The doggy is: {result['breed']}")
     print(result['probabilities'].head())
 
 if __name__ == "__main__":
     main()
-
-
-
