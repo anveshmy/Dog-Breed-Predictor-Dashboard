@@ -25,7 +25,7 @@ if option == "CoreML":
         _ , _ , prediction = core_ml_image_prediction(models[option], uploaded_image)
         rounded_probabilities = {}
         #st.write(f"Prediction: {prediction['probabilities']}")
-#        st.bar_chart(prediction['probabilities'], x = 'Breed', y='Probability', color ="#1C401C")
+       # st.bar_chart(prediction['probabilities'], x = 'Breed', y='Probability', color ="#1C401C")
         st.write(alt.Chart(prediction['probabilities'].head(top_number)).mark_bar().encode(x=alt.X('Breed', sort=None), y='Probability'))
         st.dataframe(prediction['probabilities'].head(top_number))
 elif option == "PyTorch":
