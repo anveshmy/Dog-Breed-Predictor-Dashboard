@@ -10,7 +10,31 @@ def clean_breed_name(breed_str):
     breed_str = ' '.join(word.capitalize() for word in breed_str.split())
     return breed_str
 
-def core_ml_image_prediction(model, path, resize_to=True, round_value = 5):
+def core_ml_image_prediction(model: str, path: str, resize_to: tuple[int, int] | bool = True, round_value: int = 5) -> dict:
+    """
+    Performs image prediction using a Core ML model.
+
+    Args:
+        model (str): Path to the Core ML model file.
+        path (str): Path to the input image file.
+        resize_to (tuple or bool, optional): If a tuple (width, height) is provided, the input image will be resized to the specified dimensions. If True, the image will be resized to the model's input dimensions. If False, no resizing will be performed. Defaults to True.
+        round_value (int, optional): Number of decimal places to round the predicted probabilities. Defaults to 5.
+
+    Returns:
+        dict: A dictionary containing the predicted breed and a pandas DataFrame with the predicted probabilities for each breed, sorted in descending order.
+
+    Example:
+        >>> model_path = 'path/to/model.mlmodel'
+        >>> image_path = 'path/to/image.jpg'
+        >>> result = core_ml_image_prediction(model_path, image_path)
+        >>> print(result['breed'])
+        'golden_retriever'
+        >>> print(result['probabilities'].head())
+                   Breed  Probability
+        0  golden_retriever     0.98765
+        1         labrador     0.01234
+        2            poodle     0.00001
+    """
     # resize_to: (Width, Height)
     model = ct.models.MLModel(model)
     width = model.get_spec().description.input[0].type.imageType.width
